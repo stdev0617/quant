@@ -3,6 +3,7 @@ InteractiveShell.ast_node_interactivity = "all"
 from basic.numpy import *
 from basic.series import *
 from basic.dataframe import *
+from basic.index import *
 
 if __name__ == '__main__':
     # test_numpy()
@@ -15,4 +16,5 @@ if __name__ == '__main__':
     # test_dataframe()
     # make_with_colume_and_index_names()
     # test_index_names()
-    add_column_to_dataframe()
+    #add_column_to_dataframe()
+    reindexing()
