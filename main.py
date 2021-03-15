@@ -5,6 +5,7 @@ from basic.series import *
 from basic.dataframe import *
 from basic.index import *
 from basic.financial_data_reader import *
+from pandas_lec.eda import *
 
 if __name__ == '__main__':
     # test_numpy()
@@ -19,4 +20,5 @@ if __name__ == '__main__':
     # test_index_names()
     #add_column_to_dataframe()
     # reindexing()
-    useFinanceDataReader()
+    # useFinanceDataReader()
+    test_eda()
