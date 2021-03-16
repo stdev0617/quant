@@ -41,3 +41,24 @@ def test_eda():
     print(df.describe(exclude=[np.number]).T.head())
     print(df['PER(배)'].quantile(.2))             # 하위 20% 값
     print(df['PER(배)'].quantile([.1, .2, .3]))   # 하위 10, 20, 30% 값
+
+    # 3. unique 사용하기
+
+    # dataframe에는 nunique가 있음(unique한걸 count해줌). nunique()는 nan을 씹어버린다
+    print(df.nunique())
+
+    print(df['종목명'].unique()) # 중복을 제거한 값들의 리스트를 쭉 보여줌
+    print(df['종목명'].nunique()) # 중복을 제거한 후 값이 몇개인지 number counting. 단, nan은 체크 안함
+    print(df['종목명'].value_counts()) # value_counts()는 각 인덱스에 값이 몇개 있는지 체크. nan은 역시 count 안함
+    print(df['종목명'].value_counts(normalize=True).head()) # df['종목명'].value_counts(normalize=true)각각의 값을 전체 합한 값으로 나눠주게 됨. (백분율로 보여줌. 100은 1)
+
+    a = pd.read_csv("C:/Users/owner/Downloads/inflearn_pandas_part1_material/my_data/symbol_sector.csv", index_col=0)
+    print(a.head())
+    print(a['Sector'].unique())
+    print(a['Sector'].value_counts().head())
+
+    # 4. sorting 하기
+    print(df.nsmallest(5, "PER(배)")) #  "PER(배)"라는 항목에 대해서 값이 가장 작은 5개를 보여줌
+    print(df.nsmallest(100, "PER(배)").nlargest(5, "당기순이익(억원)")) #  PER이 가장 작은 100개 중에서 당기순이익이 가장 큰 5개 종목의 데이터
+    print(df.sort_values("EPS(원)")) # EPS가 낮은거부터 오름차순으로 데이터가 정렬됨.
+    print(df.sort_values( ['순이익률(%)', 'EPS(원)'], ascending=[True, False]).head()) #  순이익률이 오름차순으로 정렬되고, 그 순이익률이 정렬된 상태에서 EPS는 내림차순으로 정렬(동일한 값에 대해서)
