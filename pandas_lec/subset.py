@@ -32,3 +32,13 @@ def useAt():
     # => Table이 크면 클 수록 더 차이가 많이 난다.
     # %timeit df.loc[100, '순이익률(%)'] # %time iteration. 주피터에서 실행시간을 측정해줌
 
+def useBooleanSeries():
+    tmp_series = pd.Series({"a":1, "b":2})
+    print(tmp_series > 2) # 데이터가 series로 나오는데, nan과 비교시 무조건 false로 나옴.
+    print(df['순이익률(%)'].head())
+    print(df['영업이익률(%)'].head())
+
+    a = df['순이익률(%)'] > df['영업이익률(%)']
+    print(a.head()) # 비교한 결과 시리즈가 쭉 나옴
+    print(a.sum()) # true인 것들의 합
+    print(a.mean())
