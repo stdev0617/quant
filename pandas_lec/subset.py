@@ -24,6 +24,37 @@ def useDtype():
     print(df.select_dtypes(include=['float']).head()) # 특정 타입의 데이터만 보여줌
     print(df.select_dtypes(include=['object']).head())
 
+def useIlocAndLoc():
+    name_df = df.set_index("종목명")
+    print(name_df.head())
+    print(name_df[0]) # 컬럼이 '0'인 series를 가져오라는 뜻
+    print(name_df.iloc[0]) # 0번째 row의 데이터를 가져옴
+    print(name_df.iloc[[0, 1]].head(1)) # i는 int로 indexing한다고 보면됨.
+    print(name_df.loc[['삼성전자', 'CJ']]) # index 이름 자체를 가지고 row를 가져옴. 중요중요중요중요
+
+    # 반드시 index를 sort 해야만 가능
+    name_df = name_df.sort_index()
+    print(name_df.head()) # 이걸로는 인덱스가 sort되었는지 알 수 없음
+    print(name_df.index.is_monotonic_increasing) # true가 나오면 정렬이 잘 되어있다는 뜻임
+    print(name_df.loc["삼성":"삼성전자"]) # 기본 리스트와는 다르게, 삼성~삼성전자까지 문자를 포함해서 조사한다. my_list[:3]은 0,1,2 출력
+    print(name_df.loc["가":"다"].head(2))
+
+    #string, list
+    print(name_df.loc["삼성전자", "순이익률(%)"]) # 삼성전자의 순이익률을 가져올 수 있음. 즉, 첫번째 인자는 row값, 두번째 인자는 컬럼임.
+    print(name_df.loc["삼성전자"]["순이익률(%)"]) # 이것도 가능하지만, 판다스에서는 위의 방식을 권장함.
+    print(name_df.loc[["삼성SDI","삼성전자"],["순이익률(%)", "EPS(원)"]]) # 이렇게 하면 multi row, multi column 검색 가능
+
+    print(name_df.iloc[[0,3], [0,1]]) # 이렇게 사용
+    # name_df.iloc[[0,3], ["상장일","종가"]] 이건 error
+
+    a = pd.Series([1,2,3], index=['a','b','c'])
+    a['a']
+    a.iloc[0] # scalar
+    a.iloc[[2]] # series
+
+    df.iloc[2] # scalar
+    df.iloc[[2]] # series
+
 def useAt():
     # dataframe의 특정 scalar 값을 가져오고싶을 때, 특정 row와 특정 column에 해당되는 값을 가져오고싶을 때.
     print(df.loc[100, '순이익률(%)'])
