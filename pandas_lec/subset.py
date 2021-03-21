@@ -7,12 +7,13 @@ from IPython.core.interactiveshell import InteractiveShell
 InteractiveShell.ast_node_interactivity = "all"
 
 df = pd.read_csv("C:/Users/owner/Downloads/inflearn_pandas_part1_material/my_data/naver_finance/2015_12.csv")
+df = df.rename(columns={"ticker": "종목명"})
 
 def subsetByColumns():
     df.head()
     print(df['EPS(원)'])
     print(type(df['순이익률(%)'])) # series로 데이터가 나옴
-    df2 = df[['EPS(원)', 'ticker']]
+    df2 = df[['EPS(원)', '종목명']]
     print(df2) # dataframe으로 결과나 나옴.
     print(df[['순이익률(%)']]) # dataframe으로 결과가 나옴. 즉, df안에 리스트를 사용하면 결과는 dataframe. 안쓰면 series로 리턴
     print(type(df[['순이익률(%)', '당기순이익(억원)']]))
@@ -20,14 +21,14 @@ def subsetByColumns():
     print(df.filter(regex="P+\w+R").head()) # \w는 문자열이 1개 이상 있다는 뜻. +는 연결. 즉, P로 시작하고, R로 끝나는 문자를 찾음. 정규표현식을 공부하자
 
 def useDtype():
-    print(df.get_dtype_counts()) # datatype 갯수를 보여줌
+    # print(df.get_dtype_counts()) # datatype 갯수를 보여줌. 근데 버전이 달라서 그런지 에러가 남...
     print(df.select_dtypes(include=['float']).head()) # 특정 타입의 데이터만 보여줌
     print(df.select_dtypes(include=['object']).head())
 
 def useIlocAndLoc():
     name_df = df.set_index("종목명")
     print(name_df.head())
-    print(name_df[0]) # 컬럼이 '0'인 series를 가져오라는 뜻
+    # print(name_df['0']) # 컬럼이 '0'인 series를 가져오라는 뜻
     print(name_df.iloc[0]) # 0번째 row의 데이터를 가져옴
     print(name_df.iloc[[0, 1]].head(1)) # i는 int로 indexing한다고 보면됨.
     print(name_df.loc[['삼성전자', 'CJ']]) # index 이름 자체를 가지고 row를 가져옴. 중요중요중요중요
@@ -73,3 +74,46 @@ def useBooleanSeries():
     print(a.head()) # 비교한 결과 시리즈가 쭉 나옴
     print(a.sum()) # true인 것들의 합
     print(a.mean())
+
+def extractSubsetByBooleanSelection():
+    a = df['순이익률(%)'] > df['영업이익률(%)']
+    print(df[a]) # true인 것들만 뺴냄
+    print(df.loc[a]) # 위와 마찬가지. df.loc[[9, 10, 13, ...]] 이런 느낌
+
+    # Multiple boolean series
+    con1 = df['순이익률(%)'] > df['영업이익률(%)']
+    con2 = df['PBR(배)'] < 1
+    print(con1.head())
+    print(con2.head())
+
+    final_con = con1 & con2
+    print(final_con.head())
+    print(df.loc[final_con, ['ROE(%)']].head(2))
+
+    name_list = ['삼성전자','현대건설','삼성물산']
+    # 1.multiple boolean series를 이용하는 방법
+    cond1 = df['종목명'] == "삼성전자"
+    cond2 = df['종목명'] == "현대건설"
+    cond3 = df['종목명'] == "삼성물산"
+    final_con = cond1 | cond2 | cond3
+    print(df[final_con])
+    # 2. Index화 해서 loc으로 가져오는 방법
+    tmp_df = df.set_index('종목명')
+    print(tmp_df.head())
+    # 3. isin() 함수를 이용해서 가져오는 방법
+    cond = df['종목명'].isin(name_list) # 여기에 들어있니? 에 대한 리스트를 돌려줌
+    print(df[cond])
+
+def exampleForAllAnyBooleanSelection():
+    a = df['순이익률(%)'] > 0 # (df['순이익률(%)'] > 0).all() 로도 사용 가능
+    a.all() # boolean 시리즈에 대해서 전부 다 트루냐?
+    a.any() # 결과 중에 트루인게 있냐?
+    (df['순이익률(%)'] > -1000000).all() # 결과는 false... 왜?
+
+    a = pd.read_csv("C:/Users/owner/Downloads/inflearn_pandas_part1_material/my_data/symbol_sector.csv", index_col=0)
+    print(a.head())
+
+    print(a['Sector'].value_counts().nlargest(5))
+    top_5_sector_list = a['Sector'].value_counts().nlargest(5).index
+    print(top_5_sector_list)
+    print(a[a['Sector'].isin(top_5_sector_list)].head())
