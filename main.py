@@ -7,6 +7,7 @@ from basic.index import *
 from basic.financial_data_reader import *
 from pandas_lec.eda import *
 from pandas_lec.subset import *
+from pandas_lec.arithmetic import *
 
 if __name__ == '__main__':
     # test_numpy()
@@ -23,10 +24,12 @@ if __name__ == '__main__':
     # reindexing()
     # useFinanceDataReader()
     # test_eda()
-    subsetByColumns()
-    useAt()
-    useBooleanSeries()
-    useDtype()
-    useIlocAndLoc()
-    extractSubsetByBooleanSelection()
-    exampleForAllAnyBooleanSelection()
+    # subsetByColumns()
+    # useAt()
+    # useBooleanSeries()
+    # useDtype()
+    # useIlocAndLoc()
+    # extractSubsetByBooleanSelection()
+    # exampleForAllAnyBooleanSelection()
+    basic_arithmetic()
+    axis()
