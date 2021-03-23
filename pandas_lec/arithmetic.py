@@ -42,3 +42,30 @@ def axis():
 
     print(np.sum([a, b], axis=0)) # y축 끼리 더함. a와 b 각각의 인덱스 위치의 값들을 더함. 결과는 [2 4 6]
     print(np.sum([a, b], axis=1)) # x축 끼리 더함. a의 모든 값을 더해서 하나의 값을, b의 모든 값을 더해서 하나의 값을 떨굼.
+
+    print(df[['순이익률(%)', 'PER(배)']].sum()) # default axis = 0, 즉, 순이익률의 모든 합, per의 모든 합이 결과로 리턴됨.
+    print(df[['순이익률(%)', 'PER(배)']].mean()) # default axis = 0
+
+    # 1. numpy array인 경우
+    # a = np.array([[1, 2], [3, 4]])
+    # 아래는 서로 다른 결과
+    # a.sum(axis=None) # axis 구분없이 모든 element sum
+    # a.sum(axis=0) # axis=0 방향으로 sum
+
+    # 2. pandas DataFrame인 경우
+    # df = pd.DataFrame(a)
+    # 아래 둘은 같은 결과
+    # df.sum(axis=None) # axis=0 방향으로 sum
+    # df.sum(axis=0) # axis=0 방향으로 sum
+
+    price_df = fdr.DataReader("005930",'2009-09-16','2018-03-21')
+    print((price_df - price_df.mean()).head()) # 모든 row별로 각 컬럼의 mean값을 빼줌
+
+    # dataFrame과 series간에 연산을 할 때, index와 column이 align이 안맞아서 생겼던 문제들을 해결할 수 있는 방법
+    # 아래 구문은 연산 불가능 했었음
+    close_series = price_df['Close']
+    print(price_df - close_series)
+    # 하지만 DataFrame이 제공하는 함수를 이용하면 가능
+    # sub()의 경우 description에 'For Series input, axis to match Series index on'라고 써있음
+    # axis=0 or 1은 무조건 description (shift + tab) 먼저 보고 판단하고 그 후에 "axis는 해당 axis를 변형(줄이거나 늘리는 것)" 적용하기
+    print(price_df.sub(close_series, axis=0).head()) # sub는 subtract임. 쓰는건, 해당 dataframe에서 매칭을 시킬 axis를 명시해주면됨.

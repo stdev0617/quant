@@ -8,6 +8,7 @@ from basic.financial_data_reader import *
 from pandas_lec.eda import *
 from pandas_lec.subset import *
 from pandas_lec.arithmetic import *
+from pandas_lec.example_for_operation import *
 
 if __name__ == '__main__':
     # test_numpy()
@@ -33,3 +34,4 @@ if __name__ == '__main__':
     # exampleForAllAnyBooleanSelection()
     basic_arithmetic()
     axis()
+    exampleForOperation()
