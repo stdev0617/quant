@@ -21,7 +21,7 @@ def calculateEarningRate():
     board3 = (0 <= df['PER(배)']) & (df['PER(배)'] < 5)
     board4 = df['PER(배)'] < 0
 
-    df.loc[bound1, 'PBR(배)'] = 1 # bound1의 조건을 만족하는 row에 대해서 PBR 값을 1로 덮어씌움.
+    df.loc[board1, 'PBR(배)'] = 1 # bound1의 조건을 만족하는 row에 대해서 PBR 값을 1로 덮어씌움.
 
     df.loc[board1] # get operation. 즉, 어떤 조건식이나 인덱스를 명시해서 원본데이터에서 추출
     df.loc[board1, 'PER_Score'] = 1 # set operation. 원본데이터의 특정 조건을 만족하는 어떤 컬럼이나 element에 대해서 원하는 값을 채워넣을 수 있음
@@ -49,10 +49,8 @@ def calculateEarningRate():
     df['PER_Score'] = df['PER_Score'].fillna(0)
     df.loc[:, 'PER_Score'] = df['PER_Score'].fillna(0) # :의 의미는 '모든 컬럼'을 의미함. pandas에서는 이 방법을 추천함
 
-
-def grouping2():
     # Boolean series 연산 특성을 이용해서 PER 그룹 나누기
-    df.loc[:, "PER_Score1"] = (bound1 * 1) + (bound2 * 2) + (bound3 * 3) + (bound4 * -1)
+    df.loc[:, "PER_Score1"] = (board1 * 1) + (board2 * 2) + (board3 * 3) + (board4 * -1)
     df['PER_Score1'].value_counts()
     df['PER_Score'].value_counts() # 위는 int 이거는 float
 
@@ -77,4 +75,3 @@ def grouping2():
     )
     print(per_cuts2.head())
     df.loc[:, 'PER_Score2'] = per_cuts # per_cuts2
-     
