@@ -39,4 +39,4 @@ if __name__ == '__main__':
     # exampleForOperation()
     # dealWithNanValue()
     # checkNanExample()
-    calculateEarningRate()
+    # calculateEarningRate()
