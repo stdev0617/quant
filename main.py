@@ -11,6 +11,7 @@ from pandas_lec.arithmetic import *
 from pandas_lec.example_for_operation import *
 from pandas_lec.handlingNanValue import *
 from pandas_lec.grouping import *
+from pandas_lec.groupby_and_aggregation import *
 
 if __name__ == '__main__':
     # test_numpy()
@@ -40,3 +41,5 @@ if __name__ == '__main__':
     # dealWithNanValue()
     # checkNanExample()
     # calculateEarningRate()
+    groupby()
+    aggregation()

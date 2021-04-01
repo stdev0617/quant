@@ -5,7 +5,7 @@ import FinanceDataReader as fdr
 from IPython.core.interactiveshell import InteractiveShell
 InteractiveShell.ast_node_interactivity = "all"
 
-df = pd.read_csv("D:/inflearn_pandas_part1_material/my_data/naver_finance/2016_12.csv")
+df = pd.read_csv("C:/Users/owner/Downloads/inflearn_pandas_part1_material/my_data/naver_finance/2016_12.csv")
 #df = df.rename(columns={"ticker": "종목명"})
 
 # 엑셀시트에 price2라고 된 컬럼은 2017년의 가격임
@@ -75,3 +75,15 @@ def calculateEarningRate():
     )
     print(per_cuts2.head())
     df.loc[:, 'PER_Score2'] = per_cuts # per_cuts2
+
+    # qcut을 배운다. quantile cut. 즉, 균등하게 분할하여 그룹으로 나눔
+    print(pd.qcut(df['PER(배)'], 3)) # 즉, PER기준으로 3개의 그룹으로 나눈다
+    print(pd.qcut(df['PER(배)'], 3, labels=[1, 2, 3]).head())
+    df.loc[:, 'PER_Score2'] = pd.qcut(df['PER(배)'], 10, labels=range(1, 11))
+    df['PER_Score2'].value_counts()
+    df['PER_Score2'].hasnans
+    df['PER_Score2'].isna().sum()
+
+    df['PER_Score2'].dtype # CategoricalDtype(categories=Noneordered=True) 가 결과로 나옴. 즉, 그룹핑되어있음..
+    df['PER_Score2'] = df['PER_Score2'].fillna(-1) # 에러남. 그룹핑되어있는데, 새로운 -1이라는 카테고리로 묶으려고하니까 에러나는거
+    # df = df.dropna(subset=['PER(배)']) # 컬럼에 nan이 하나라도 있으면 row를 날려버려라 라는 뜻임. 근데 에러나는데?
