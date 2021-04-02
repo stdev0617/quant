@@ -98,3 +98,71 @@ def aggregation():
 
     pbr_rtn_df.plot(kind='bar')
     per_rtn_df.plot(kind='bar')
+
+def example_for_groupby():
+    g_df1 = g_df.groupby(["PBR_score", "PER_score"])\
+                .agg({
+                        'rtn': ['mean', 'std', 'min', 'max'],
+                        'ROE(%)': [np.mean, 'size', 'nunique', 'idxmax']
+                })
+    g_df1.head()
+
+    #다른 방법
+    g_df.groupby(["PBR_score", "PER_score"])['rtn', 'ROE(%)'].agg(['sum', 'mean']).tail(10)
+    a = g_df.groupby(["PBR_score", "PER_score"])['rtn', 'ROE(%)'].agg(['sum', 'mean'])
+
+    # Multi-index라고 해서 쫄 것 없음!
+    a.loc[1]
+    a.loc[(1, 3)]
+    a.loc[[(1, 3)]]
+    # a.loc[[1, 3]]
+
+    # 주의) nan은 groupby시 자동으로 filter out 되기 때문에, 미리 전처리 다 하는게 좋음
+    df = pd.DataFrame({
+        'a': ['소형주', np.nan, '대형주', '대형주'],
+        'b': [np.nan, 2, 3, np.nan],
+    })
+
+    print(df)
+    print(df.groupby(['a'])['b'].mean()) # nan값을 제외하고 평균을 냄. 그래서 대형주는 평균값이 3000이 나오고, 소형주는 nan이 나옴
+
+    # as_index = False: group col들이 index가 아니라 하나의 col이 됨(aggregate하고 reset_index()를 취한 것)
+    a = g_df.groupby(["PER_score"]).agg({'rtn': ['mean', 'std']}).head(2)
+    b = g_df.groupby(["PER_score"], as_index=False).agg({'rtn': ['mean', 'std']}).head(2)
+
+    print(a)
+    print(b)
+
+    print(a.index)
+    print(a.columns)
+
+    print(b.index)
+    print(b.columns)
+
+    print(a['rtn'])
+    print(a[('rtn', 'mean')].head())
+
+    # Squash the Multi-index columns
+    g_df1.head()
+
+    level0 = g_df1.columns.get_level_values(0)
+    level1 = g_df1.columns.get_level_values(1)
+
+    print(level0)
+    print(level1)
+
+    g_df1.columns = level0 + '_' + level1
+    print(g_df1.head(2))
+
+    g_df1 = g_df1.reset_index() # df에 인덱스를 다 채워서 보여줌
+    print(g_df1.head())
+
+def example2_for_groupby():
+    a_df = pd.read_csv("C:/Users/owner/Downloads/inflearn_pandas_part1_material/my_data/Small_and_Big.csv", index_col=[0])
+    a_df.head()
+
+    a_df.tail()
+
+    median_df = a_df.groupby(['date']).agg({'시가총액 (보통)(평균)(원)': 'median'})
+    median_df.columns = ['시가총액_median']
+    print(median_df.head())
