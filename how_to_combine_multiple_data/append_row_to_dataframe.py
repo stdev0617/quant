@@ -96,8 +96,8 @@ def appendUsingAppend():
 #  - operation axis에 따라 concat되는 object의 column or index가 union 됨.
 def using_concat():
     # 예제 1
-    samsung_df = dfr.DataReader('005390', '2009-01-01', '2017-12-31')
-    kodex_df = dfr.DataReader('069500', '2009-01-01', '2017-12-31')
+    samsung_df = fdr.DataReader('005390', '2009-01-01', '2017-12-31')
+    kodex_df = fdr.DataReader('069500', '2009-01-01', '2017-12-31')
 
     print(samsung_df.head(2))
     print(kodex_df.head(2))
@@ -118,7 +118,7 @@ def using_concat():
 
     # On axis=1
     print(pd.concat([samsung_df, kodex_df], axis=1).head())
-    print(pd.concat([samsung_df, kodex_df], keys=['삼성', 'KODEX200'], axis=1),head(2))
+    print(pd.concat([samsung_df, kodex_df], keys=['삼성', 'KODEX200'], axis=1).head(2))
 
     # join argument
     # - How to handle indexs on other axis(es), 즉, concat의 대상이 되는(=명시되는) axis 말고,
@@ -180,4 +180,26 @@ def concatExample():
     #   - concat과 달리, index, column명이 아니라, value 값 자체를 이용한 join
     #   - cartesian product joining
     #   - Defaults to left join
+    # 결론: join()은 특정 컬럼의 값이 같은 것을 기준으로 두 데이터프레임을 하나로 합친다.
+    #      concat()은 index나 column 이름을 기준으로 두 데이터 프레임이 하나로 합쳐진다.
 
+    left = pd.DataFrame({'A': ['A0', 'A1', 'A2'], 'B': ['B0', 'B1', 'B2']}, index=['K0', 'K1', 'K2'])
+    right = pd.DataFrame({'C': ['C0', 'C2', 'C3'], 'D': ['D0', 'D2', 'D3']}, index=['K0', 'K2', 'K3'])
+
+    print(left)
+    print(right)
+
+    left.join(right) # left의 교집합. left를 기준으로 K1 index의 C, D 값이 NaN이고 나머지는 쭉 붙음.
+    left.join(right, how='outer')  # 합집합. 단, 값이 없는것은 NaN으로 뜸.
+
+    left = pd.DataFrame({'A': ['A0', 'A1', 'A2', 'A3'], 'B': ['B0', 'B1', 'B2','B3']}, index=['K0', 'K1', 'K0', 'K1'])
+    right = pd.DataFrame({'C': ['C0', 'C1'], 'D': ['D0', 'D1']}, index=['K0', 'K1'])
+
+    print(left)
+    print(right)
+
+    # 아래 내용은 join()과 concat()의 큰 차이점 중 하나임.
+    # 분명 left는 key column의 값에 K0, K1이 있지만, on='key를 통해서 right의 index가 key 컬럼의 값에 기준을 맞춰서 하나가 됨.
+    left.join(right, on='key')
+    left.join(right, on='key').set_index("key")
+    left.set_index('key').join(right)
