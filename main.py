@@ -46,5 +46,6 @@ if __name__ == '__main__':
     # aggregation()
     # example_for_groupby()
     # example2_for_groupby()
-    appendWithoutUsingAppend()
-    appendUsingAppend()
+    # appendWithoutUsingAppend()
+    # appendUsingAppend()
+    joinExample()

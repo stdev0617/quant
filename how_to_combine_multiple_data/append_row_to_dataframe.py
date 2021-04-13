@@ -183,6 +183,7 @@ def concatExample():
     # 결론: join()은 특정 컬럼의 값이 같은 것을 기준으로 두 데이터프레임을 하나로 합친다.
     #      concat()은 index나 column 이름을 기준으로 두 데이터 프레임이 하나로 합쳐진다.
 
+def joinExample():
     left = pd.DataFrame({'A': ['A0', 'A1', 'A2'], 'B': ['B0', 'B1', 'B2']}, index=['K0', 'K1', 'K2'])
     right = pd.DataFrame({'C': ['C0', 'C2', 'C3'], 'D': ['D0', 'D2', 'D3']}, index=['K0', 'K2', 'K3'])
 
@@ -192,7 +193,7 @@ def concatExample():
     left.join(right) # left의 교집합. left를 기준으로 K1 index의 C, D 값이 NaN이고 나머지는 쭉 붙음.
     left.join(right, how='outer')  # 합집합. 단, 값이 없는것은 NaN으로 뜸.
 
-    left = pd.DataFrame({'A': ['A0', 'A1', 'A2', 'A3'], 'B': ['B0', 'B1', 'B2','B3']}, index=['K0', 'K1', 'K0', 'K1'])
+    left = pd.DataFrame({'A': ['A0', 'A1', 'A2', 'A3'], 'B': ['B0', 'B1', 'B2','B3'], 'key':['K0', 'K1', 'K0', 'K1']}, index=['K0', 'K1', 'K0', 'K1'])
     right = pd.DataFrame({'C': ['C0', 'C1'], 'D': ['D0', 'D1']}, index=['K0', 'K1'])
 
     print(left)
@@ -203,3 +204,21 @@ def concatExample():
     left.join(right, on='key')
     left.join(right, on='key').set_index("key")
     left.set_index('key').join(right)
+
+    a = pd.DataFrame([1, 2, 3], index=['a', 'b', 'c'], columns=['안녕'])
+    b = pd.DataFrame([4, 2, 6], index=['a', 'c', 'd'], columns=['안녕'])
+    print(a)
+    print(b)
+
+    a.join(b, lsuffix="_x", rsuffix="_y", how="inner")
+
+    a_df = pd.read_csv("C:/Users/owner/Downloads/inflearn_pandas_part1_material/my_data/Small_and_Big.csv", index_col=[0])
+    print(a_df)
+
+    median_df = a_df.groupby(['date']).agg({'시가총액 (보통)(평균)(원)': 'median'})
+    median_df.columns = ['시가총액_median']
+    print(median_df.head())
+
+    joined_df = a_df.join(median_df, on="date")
+    print(joined_df.head())
+    print(joined_df[joined_df['date'] == "2000-08-31"].head())
