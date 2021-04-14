@@ -222,3 +222,52 @@ def joinExample():
     joined_df = a_df.join(median_df, on="date")
     print(joined_df.head())
     print(joined_df[joined_df['date'] == "2000-08-31"].head())
+
+# merge는 join과 동일
+# Aligns the calling DataFrame's column(s) with the other DataFrame's columns(s)
+#   - left_index, right_index도 존재
+#   - join()
+#       - 사실 내부적으로 reset_index()하고 merge() 호출함
+# Cartesian product joining
+# Defaults to inner join
+# concat()과 달리, index, column명이 아니라, value값 자체를 이용한 join
+ def mergeExample():
+    left = pd.DataFrame({'key1': ['K0', 'K0', 'K1', 'K2'],
+                         'key2': ['K0', 'K1', 'K0', 'K1'],
+                         'A': ['A0', 'A1', 'A2', 'A3'],
+                         'B': ['B0', 'B1', 'B2', 'B3']})
+    right = pd.DataFrame({'key1': ['K0', 'K1', 'K1', 'K2'],
+                         'key2': ['K0', 'K0', 'K0', 'K0'],
+                         'C': ['C0', 'C1', 'C2', 'C3'],
+                         'D': ['D0', 'D1', 'D2', 'D3']})
+    print(left)
+    print(right)
+
+    pd.merge(left, right, on=['key1', 'key2'])
+    pd.merge(left, right, how='outer', on=['key1', 'key2'])
+    pd.merge(left, right, how='right', on=['key1', 'key2'])
+    pd.merge(left, right, how='left', on=['key1', 'key2'])
+
+    # more about Cartesian product joining
+    left = pd.DataFrame({'A': [1, 2,], 'B':[2, 2]})
+    right = pd.DataFrame({'A': [4, 5, 6], 'B': [2, 2, 2]})
+
+    print(left)
+    print(right)
+
+    # left, right, inner, outer 결과가 다 같음
+    # suffixes = ('_x', '_y') 가 있음
+    pd.merge(left, right, on='B', how='left')
+
+    close_df = samsung_df['Close'].reset_index()
+    vol_df = samsung_df['Volume'].reset_index()
+
+    print(close_df.head())
+    print(vol_df.head())
+
+    # on을 명시 안하면 알아서 같은 컬럼끼리 이름을 맞춤.
+    # default is 'inner' join
+    pd.merge(close_df, vol_df.iloc[:2])
+
+    # 'outer' join
+    print(pd.merge(close_df, vol_df.iloc[:2], how="outer").head(5))
