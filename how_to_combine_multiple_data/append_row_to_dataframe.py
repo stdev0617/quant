@@ -13,6 +13,9 @@ def appendWithoutUsingAppend():
     df = pd.DataFrame(columns=['a', 'b'])
     df.head()
 
+    name_list = ['삼성전자', '현대건설', '삼성물산']
+    cond = df['종목명'].isin(name_list)
+
     df.loc[["인덱스이름"]]
     df.loc[cond,"컬럼명"]
 
@@ -94,10 +97,11 @@ def appendUsingAppend():
 # index(or columns)에 대해 align(not values)
 # Defaults to outer join
 #  - operation axis에 따라 concat되는 object의 column or index가 union 됨.
+samsung_df = fdr.DataReader('005390', '2009-01-01', '2017-12-31')
+kodex_df = fdr.DataReader('069500', '2009-01-01', '2017-12-31')
+
 def using_concat():
     # 예제 1
-    samsung_df = fdr.DataReader('005390', '2009-01-01', '2017-12-31')
-    kodex_df = fdr.DataReader('069500', '2009-01-01', '2017-12-31')
 
     print(samsung_df.head(2))
     print(kodex_df.head(2))
@@ -124,7 +128,7 @@ def using_concat():
     # - How to handle indexs on other axis(es), 즉, concat의 대상이 되는(=명시되는) axis 말고,
     # 다른 axis의 index에 대해 어떻게 join 할 것인가?
     # inner는 교집합, outer는 합집합이라고 생각하면됨
-    result = pd.concat([df1, df4], axis=1, join='inner')
+    # result = pd.concat([df1, df4], axis=1, join='inner')
     
     # default 'outer' join
     pd.concat([samsung_df, kodex_df], keys=['삼성', 'kodex'], axis=1, names=['종목명']).head()
@@ -231,7 +235,7 @@ def joinExample():
 # Cartesian product joining
 # Defaults to inner join
 # concat()과 달리, index, column명이 아니라, value값 자체를 이용한 join
- def mergeExample():
+def mergeExample():
     left = pd.DataFrame({'key1': ['K0', 'K0', 'K1', 'K2'],
                          'key2': ['K0', 'K1', 'K0', 'K1'],
                          'A': ['A0', 'A1', 'A2', 'A3'],
