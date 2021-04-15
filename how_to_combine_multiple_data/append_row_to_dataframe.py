@@ -275,3 +275,28 @@ def mergeExample():
 
     # 'outer' join
     print(pd.merge(close_df, vol_df.iloc[:2], how="outer").head(5))
+
+# join & merge 각각 언제 사용?
+# index가 하나라도 관여하면 => join()
+# 둘 다 column에 맞춰야하면 => merge()
+# merge() 사용시, left_index, right_index 사용하면 join()과 결과가 같음
+# join() 사용시 reset_index()하고, merge써도됨
+def compareAppendingFuncs():
+    a = pd.DataFrame([1, 2, 3], index=['a', 'b', 'c'], columns=['안녕'])
+    b = pd.DataFrame([4, 2, 6], index=['a', 'c', 'd'], columns=['안녕'])
+    print(a)
+    print(b)
+
+    a.merge(b)
+    a.merge(b, left_index=True, right_index=True)
+    a.join(b, lsuffix="_x", rsuffix="_y", how="inner")
+
+    # concat vs join, merge
+    a = pd.DataFrame({"a": [1, 2, 3], }, index=[1, 2, 3])
+    a = pd.DataFrame({"b": [1, 4, 5], }, index=[1, 4, 5])
+    print(a)
+    print(b)
+
+    # 두 개 합쳐짐.
+    pd.concat([a, b], axis=1)
+
