@@ -300,3 +300,60 @@ def compareAppendingFuncs():
     # 두 개 합쳐짐.
     pd.concat([a, b], axis=1)
 
+def appendingNewRowsExample():
+    product_df = pd.read_csv("C:/Users/owner/Downloads/inflearn_pandas_part1_material/my_data/product.csv", index_col=0)
+    review_df = pd.read_csv("C:/Users/owner/Downloads/inflearn_pandas_part1_material/my_data/review.csv", index_col=0)
+
+    print(product_df.shape)
+    print(review_df.shape)
+
+    print(product_df.head(2))
+    print(review_df.head(2))
+
+    flipkart_df = pd.merge(
+        product_df, review_df,
+        how='right',
+        left_on="id",
+        right_on='product__id'
+    )
+
+    print(flipkart_df.shape)
+    print(flipkart_df.head(2))
+
+    flipkart_df = flipkart_df.drop(['id', 'product__id', 'author'], axis=1)
+    print(flipkart_df.head(2))
+
+    amazon_df = pd.read_csv(product_df = pd.read_csv("C:/Users/owner/Downloads/inflearn_pandas_part1_material/my_data/amazon_review1.csv", index_col=0))
+    print(amazon_df.head(2))
+
+    print(amazon_df.shape)
+    print(flipkart_df.shape)
+
+    df = pd.concat([amazon_df, flipkart_df], axis=0)
+    print(df.shape)
+    print(df.head())
+
+    df['date'] = pd.to_datetime(df['date'])
+    df['price'] = df['price'].astype(float)
+
+    df.set_index('date', inplace=True)
+    df = df.loc[:"2017-12-31"]
+
+    df.rename(columns={'title_x':'name', 'title_y':'title'}, inplace=True)
+    df['price_grp'] = pd.cut(df['price'], [0, 5000, 15000, 20000], labels=["저가", "중가", "고기"])
+
+    print(df.head())
+
+    print(df.index)
+
+    print(df.index.month)
+
+    df.groupby([df.index.year,])
+    df.groupby(['year', 'quarter']).agg({'price':'mean'})
+
+    ax = df.resample("Q")['price'].mean().plot()
+    ax.set_title("기간별 제품 평균가격")
+    ax.set_xlable("기 간")
+
+    df.groupby([df.index.year, df.index.quarter]).agg({'price':'mean'})
+
