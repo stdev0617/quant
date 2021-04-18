@@ -351,9 +351,12 @@ def appendingNewRowsExample():
     df.groupby([df.index.year,])
     df.groupby(['year', 'quarter']).agg({'price':'mean'})
 
-    ax = df.resample("Q")['price'].mean().plot()
-    ax.set_title("기간별 제품 평균가격")
-    ax.set_xlable("기 간")
+    df.groupby([df.index.year, df.index.quarter]).agg({'price': 'mean'}).plot(kind='bar')
 
-    df.groupby([df.index.year, df.index.quarter]).agg({'price':'mean'})
+    ax = df.resample("Q")['price'].mean().plot();
+    ax.set_title("기간별 제품 평균가격");
+    ax.set_xlable("기 간");
+    ax.set_ylable("가 격");
 
+    df.groupby(['brand']).agg({'name':'count'})
+    df.groupby(['brand']).agg({'name': 'count'}).plot(kind='bar', figsize=(8,5));
