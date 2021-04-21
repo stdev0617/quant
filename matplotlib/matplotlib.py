@@ -36,3 +36,21 @@ def stateful():
 
     # 아래는 index (timeseries), column 매핑을 통해 값을 출력하는 예제
     plt.plot(samsung_df, samsung_df['Close']);
+
+# Stateless(or object-oriented)
+# Matplotlib의 component를 하나의 object로 받아서, 함수 실행 및 property 설정/변경
+#   - figure, ax(es)를 먼저 생성한다음, 하나하나 더하고, 적용하는 식
+# 적용과정이 명시적으로 코드로 드러나기 때문에 조금 더 직관적임
+# plot을 객체로 만든다고 생각하면 편할듯
+def stateless():
+    fig, ax = plt.subplots(figsize=(15, 3))
+    ax.plot(x, y);
+    ax.set_xlim(0, 10);
+    ax.set_ylim(-3, 8);
+    ax.set_xlabel('X axis');
+    ax.set_ylabel('Y axis');
+    ax.set_title('Line Plot');
+    fig.suptitle('Figure Title', size=10, y=1.03);
+
+    fig, ax = plt.subplots(figsize=(15, 3))
+    ax.plot(samsung_df.index, samsung_df['Close'])
