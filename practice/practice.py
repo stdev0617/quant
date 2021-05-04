@@ -68,3 +68,54 @@ def getYearlyReturns():
     # 2012/12에 매수했으면,
     # 2013년 1월에 상장폐지 되었을 수도 있고, 2013년 12월(초)에 되었을 수도 있기 때문에 => rtn이 nan처리됨
 
+    # Single Indicator(지표) backtesting
+    #   Section1: reset_index()
+    #   Section2: boolean selection, DataFrame arithmetic operation, dtype변환
+    #   Section3: groupby() & aggregation
+    #   Section4: join(), pivot()
+    #   Section5: visualization
+
+    # DataFrame(matrix) Multiplication 복습
+
+    def multiplicationExample():
+        a = pd.DataFrame([[1, 2], [3, np.nan, ], [5, 6]], columns=["a", "b"])
+        b = pd.DataFrame([[1, 2], [3, 4, ], [5, 6]], columns=["a", "b"]) * 10
+        print(a)
+        print(b)
+        print(a*b)
+
+        a = pd.DataFrame([[1, 2], [3, np.nan, ], [5, 6]], columns=["a", "b"])
+        b = pd.DataFrame([[1, 2, 3], [3, 4, 5], [5, 6, 7]], columns=["c", "b", "d"]) * 10
+        print(a)
+        print(b)
+        print(a*b)
+
+        return_df = pd.DataFrame(
+            [
+                [np.nan, np.nan, 2],
+                [3, np.nan, 3],
+                [5, 6, np.nan],
+            ],
+            columns=["삼성", "현대", "SK"]
+        )
+        asset_on_df = pd.DataFrame(
+            [
+                [0, 1],
+                [0, 1],
+                [1, 0],
+            ],
+            columns=["삼성", "SK"]
+        )
+        return_df
+        asset_on_df
+
+        print(return_df * asset_on_df)
+        print((return_df * asset_on_df).mean(axis=1))
+
+        # 해결책
+        asset_on_df = asset_on_df.replace(0, np.nan)
+
+        print(return_df * asset_on_df)
+
+        # "동일가중" 방식의 투자인 경우, 포트폴리오 평균수익률 구하는 방법
+        (return_df * asset_on_df).mean(axis=1)
