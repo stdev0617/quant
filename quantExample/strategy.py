@@ -67,3 +67,39 @@ def makeSmallStockAndLowPBRStrategy():
 
     rtn_series, cum_rtn_series = get_return_series(selected_return_df)
     plot_return(cum_rtn_series, rtn_series)
+
+# Filter
+#  - ROA 5% 이상
+#  - 부채비율 50% 이하
+# Select
+#  - (PBR 0.2 이상)
+#  - PBR 낮은기업 20~30개 매수
+def lastPresentUpgrade():
+    #
+    # Filter
+    #
+
+    # ROA >= 0.05
+    filtered_df = df[df['ROA'] >= 0.05]
+
+    # 부채비율 <= 0.5
+    filtered_df['부채비율'] = filtered_df['비유동부채'] / filtered_df['자산총계']
+    filtered_df = filtered_df[filtered_df['부채비율'] <= 0.5]
+
+    #
+    # Selector(위의 투자전략22 것 그대로)
+    #
+    filtered_df = filtered_df[filtered_df['PBR'] >= 0.2]
+
+    smallest_pbr_series = filtered_df.groupby("year")['PBR'].nsmallest(15)
+    selected_index = smallest_pbr_series.index.get_level_values(1)
+
+    selector_df = filtered_df.loc[selected_index].pivot(
+        index='year', columns="Name", values="PBR"
+    )
+
+    asset_on_df = selector_df.notna().astype(int).replace(0, np.nan)
+    selected_return_df = yearly_rtn_df * asset_on_df
+
+    rtn_series, cum_rtn_series = get_return_series(selected_return_df)
+    plot_return(cum_rtn_series, rtn_series)
