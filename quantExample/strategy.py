@@ -103,3 +103,70 @@ def lastPresentUpgrade():
 
     rtn_series, cum_rtn_series = get_return_series(selected_return_df)
     plot_return(cum_rtn_series, rtn_series)
+
+# 슈퍼가치전략
+# * Filter
+#  - 시가총액 하위 20%
+# * Selector
+#  - PBR, PCR, PER, PSR 순위를 매김
+#  - 각 순위를 sum을 해서 통합순위를 구함
+#  - 통합순위가 가장 높은 종목 50개 매수
+def superValueStrategy():
+    #
+    # Filter
+    #
+    market_cap_quantile_series = df.groupby("year")['시가총액'].quantile(.2)
+    filtered_df = df.join(market_cap_quantile_series, on="year", how="left", rsuffix="20%_quantile")
+    filtered_df = filtered_df[filtered_df['시가총액'] <= filtered_df['시가총액20%_quantile']]
+
+    pd.Series([100, 1, 1, 3]).rank(method="max")
+    pd.Series([100, 1, 1, 3]).rank(method="min")
+
+    pbr_rank_series = filtered_df.groupby("year")['PBR'].rank(method="max")
+    per_rank_series = filtered_df.groupby("year")['PER'].rank(method="max")
+    psr_rank_series = filtered_df.groupby("year")['PSR'].rank(method="max")
+
+    psr_rank_series.head()
+
+    psr_rank_series.sort_values().dropna().head()
+
+    filtered_df = filtered_df.join(pbr_rank_series, how="left", rsuffix="_rank")
+    filtered_df = filtered_df.join(per_rank_series, how="left", rsuffix="_rank")
+    filtered_df = filtered_df.join(psr_rank_series, how="left", rsuffix="_rank")
+
+    filtered_df['PBR_rank'].isna().sum()
+
+    # 어떻게 각 rank column의 nan을 메꿔야할까?
+    filtered_df.filter(like="rank").columns
+
+    #
+    # 주의: 종목을 선택하는 로직ㅇ[ 따라, '가장 작은 rank'로 부여하는게 타당할 수도 있고, '가장 큰 rank'로 부여하는 것이 타당할 수도 있습니다.
+    # 예를들어, PER이 작을수록 종목 선정에 우선 순위가 있도록 할 예정이고, PER이 작을수록 rank값이 작도록 설정했다면,
+    # PER이 nan인 종목들은 PER rank가 가장 큰 값(혹은 그 값보다 +1인 값)으로 메꿔져야 penalty를 받을 수 있습니다.
+    #
+
+    # 1. 0으로 메꾸는 법
+    filtered_df.loc[:, filtered_df.filter(like="rank").columns] = filtered_df.filter(like="rank").fillna(0)
+
+    # 2. 각 rank별 max 값 (혹은 그것보다 1 큰 값)으로 메꾸는 법
+    # filtered_df['PBR_rank'] = filtered_df['PBR_rank'].fillna(filtered_df['PBR_rank'].max() + 1)
+    # filtered_df['PER_rank'] = filtered_df['PER_rank'].fillna(filtered_df['PER_rank'].max() + 1)
+    # filtered_df['PSR_rank'] = filtered_df['PSR_rank'].fillna(filtered_df['PSR_rank'].max() + 1)
+
+    filtered_df['rank_sum'] = filtered_df.filter(like="_rank").sum(axis=1)
+
+    #
+    # Selector
+    #
+    max_rank_series = filtered_df.groupby("year")['rank_sum'].nlargest(15)
+    selected_index = max_rank_series.index.get_level_values(1)
+
+    selector_df = filtered_df.loc[selected_index].pivot(
+        index='year', columns="Name", values="rank_sum"
+    )
+
+    asset_on_df = selector_df.notna().astype(int).replace(0, np.nan)
+    selected_return_df = yearly_rtn_df * asset_on_df
+
+    rtn_series, cum_rtn_series = get_return_series(selected_return_df)
+    plot_return(cum_rtn_series, rtn_series)
