@@ -170,3 +170,54 @@ def superValueStrategy():
 
     rtn_series, cum_rtn_series = get_return_series(selected_return_df)
     plot_return(cum_rtn_series, rtn_series)
+
+
+# 재무제표 기반 실전 프로젝트의 한계¶
+# 1. (중요)Look ahead bias & Survivalship bias
+#  - 특정 년도에 상장이 폐지가 되었다면 -> 바로 이전 년도에서 종목선정에 고려가 안됨
+#  - 즉, 이미 상장 폐지 정보를 미래 시점에서 확인하고, 해당 년도의 수익률을 nan으로 미리 메꾸어 버림
+# 2. Data availability(time alignment)
+#  - 각 투자지표의 값들이 공시 되는 시기
+#     - 년도별, 분기별
+#  - 정확한 상장폐지 날짜?
+# 3. Data acquisition
+#  - 고정된 과거데이터로만 테스트 하면 안됨 -> 계속 새로운 데이터에 대한 갱신 필요
+#  - 크롤링, 증권사 API, 유료 데이터 벤더 등
+# 4. Data의 무결성
+#  - 아무리 증권사 API나 유로 벤더를 통해서 받아온 데이터라도, 문제가 있는 경우가 많음
+#  - 예를 들어, 일봉 OHLC -> C가 H보다 더 큰 경우 / 배당락, 주식분할 등의 이벤트가 제대로 반영이 안된 경우 등
+#  - 데이터의 결함, nunique==1, 비이상적인 값 등에 대한 EDA 필요
+# 5. 데이터가 년도별로만 존재하기 때문에, 1년에 한번 수익률이 찍혀서 변동성, MDD를 제대로 파악하기 어려움
+# 6. 거래세, 수수료 반영 X
+#  - 정확한 asset turnover 고려가 안됨
+# 7. 기타 위 실전예제에서의 한계
+#  - 데이터의 cleaning, validation 필요
+#  - Missing value에 대한 전처리 필요
+#  - 주어진 데이터 존재하지 않는 지표(column)은 다른 지표로 대체한 점
+
+# 혼자 진행해보면 좋을 것들
+#  - transform(), apply() 함수 등을 구글링해서 독학해보기
+#  - OOP 방식으로 구현해보기(확장성 있는 코드화)
+def etc():
+    filter_list = [
+        ColumnIndicator("부채비율", 0.5, lower_than=False),
+        ColumnIndicator("ROE", 0.5, lower_than=True),
+    ]
+    selector = Selector("PBR", 20, lowest=True)
+
+    backtest = Backtest(filter_list, selector, yearly_rtn_df)
+    backtest.run()
+
+    # 거래비용 주기
+    for_positive_df = (yearly_rtn_df > 0).astype(int) * 0.99
+    for_negative_df = (yearly_rtn_df < 0).astype(int) * 1.01
+
+    extra_fee_considered_weight_df = for_positive_df + for_negative_df
+    yearly_rtn_df = yearly_rtn_df * extra_fee_considered_weight_df
+
+    # weight
+    #
+    #  - 지금까지는 종목 선택 후, 다 동일가중 투자(mean()만으로 평균수익률을 구할 수 있었음)
+    #  - e.g. ROA의 비중만큼 넣기
+    #     - Top n개의 종목을 산출 후, 각각의 값을 1,0(nan)으로 변환하기 전에, selector_df를 sum(axis=1)로 나눠주기 등
+    #  - 분기별 데이터 & 리벨런싱
